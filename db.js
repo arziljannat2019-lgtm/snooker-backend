@@ -1,15 +1,15 @@
-const mysql = require('mysql2');
+const mysql = require("mysql2");
 
-// Create MySQL connection using Railway Environment Variables
+// FINAL FIXED PUBLIC DATABASE CONNECTION (Render + Railway Compatible)
 const db = mysql.createConnection({
-    host: process.env.DB_HOST || process.env.MYSQLHOST,
-    user: process.env.DB_USER || process.env.MYSQLUSER,
-    password: process.env.DB_PASS || process.env.MYSQLPASSWORD,
-    database: process.env.DB_NAME || process.env.MYSQLDATABASE,
-    port: process.env.DB_PORT || process.env.MYSQLPORT || 3306
+    host: process.env.DB_HOST,
+    user: process.env.DB_USER,
+    password: process.env.DB_PASS,
+    database: process.env.DB_NAME,
+    port: process.env.DB_PORT
 });
 
-// Connect to database
+// Connect to MySQL
 db.connect((err) => {
     if (err) {
         console.error("❌ Database connection failed:", err);
