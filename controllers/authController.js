@@ -1,6 +1,6 @@
-import db from "../db.js";
+const db = require("../db");
 
-export const loginUser = (req, res) => {
+exports.loginUser = (req, res) => {
     const { username, password } = req.body;
 
     const sql = "SELECT * FROM users WHERE username=? AND password=?";

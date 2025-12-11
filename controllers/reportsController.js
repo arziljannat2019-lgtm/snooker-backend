@@ -1,6 +1,6 @@
-import db from "../db.js";
+const db = require("../db");
 
-export const getDailyReport = (req, res) => {
+exports.getDailyReport = (req, res) => {
   const { branch, date } = req.query;
   if (!branch || !date) return res.json({});
   const sql = `
@@ -17,8 +17,8 @@ export const getDailyReport = (req, res) => {
   });
 };
 
-export const getMonthlyReport = (req, res) => {
-  const { branch, month } = req.query; // month = "2025-12"
+exports.getMonthlyReport = (req, res) => {
+  const { branch, month } = req.query;
   if (!branch || !month) return res.json({});
   const sql = `
     SELECT
@@ -34,7 +34,7 @@ export const getMonthlyReport = (req, res) => {
   });
 };
 
-export const getSummaryReport = (req, res) => {
+exports.getSummaryReport = (req, res) => {
   const { branch } = req.query;
   if (!branch) return res.json({});
   const sql = `

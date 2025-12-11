@@ -1,12 +1,12 @@
-import db from "../db.js";
+const db = require("../db");
 
-export const syncOfflineSessions = (req, res) => {
+exports.syncOfflineSessions = (req, res) => {
     const sessions = req.body.sessions;
 
     if (!sessions || sessions.length === 0)
         return res.json({ success: true });
 
-    let insertSQL = `
+    const insertSQL = `
         INSERT INTO table_sessions 
         (table_id, branch_code, rate_type, frame_rate, century_rate, start_time, end_time, total_amount, canteen_amount)
         VALUES ?
@@ -26,7 +26,6 @@ export const syncOfflineSessions = (req, res) => {
 
     db.query(insertSQL, [bulkValues], (err) => {
         if (err) return res.json({ success: false });
-
         res.json({ success: true });
     });
 };

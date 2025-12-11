@@ -1,6 +1,6 @@
-import db from "../db.js";
+const db = require("../db");
 
-export const saveDayClose = (req, res) => {
+exports.saveDayClose = (req, res) => {
     const { shift1, shift2, combined } = req.body;
 
     const sql = `
