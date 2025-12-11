@@ -14,22 +14,29 @@ require("./db");
 
 const app = express();
 
-/* ------------------ FINAL CORS FIX FOR VERCEL ------------------ */
-app.use(cors({
-  origin: "https://frontend-ten-kappa-99.vercel.app",  // your Vercel frontend URL
-  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-  allowedHeaders: ["Content-Type", "Authorization"],
-  credentials: false
-}));
+/* ---------------------------------------------------------------
+   🔥 MANUAL CORS FIX (RENDER + VERCEL)
+   Yeh sabse upar hona zaroori hai.
+--------------------------------------------------------------- */
+app.use((req, res, next) => {
+  res.header("Access-Control-Allow-Origin", "https://frontend-ten-kappa-99.vercel.app");
+  res.header("Access-Control-Allow-Methods", "GET,POST,PUT,DELETE,OPTIONS");
+  res.header("Access-Control-Allow-Headers", "Content-Type, Authorization");
 
-// Preflight (OPTIONS) MUST be handled
-app.options("/api/*", cors({
+  // Preflight request handled HERE
+  if (req.method === "OPTIONS") {
+    return res.sendStatus(200);
+  }
+  next();
+});
+/* --------------------------------------------------------------- */
+
+// OPTIONAL: keep normal cors (no issue to keep both)
+app.use(cors({
   origin: "https://frontend-ten-kappa-99.vercel.app",
   methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
   allowedHeaders: ["Content-Type", "Authorization"],
 }));
-
-/* --------------------------------------------------------------- */
 
 app.use(express.json());
 
