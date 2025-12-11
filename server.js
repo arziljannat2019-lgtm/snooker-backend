@@ -16,18 +16,24 @@ const app = express();
 
 /* ------------------ FINAL CORS FIX FOR VERCEL ------------------ */
 app.use(cors({
-  origin: "https://frontend-ten-kappa-99.vercel.app", // <-- Tumhara live frontend URL
+  origin: "https://frontend-ten-kappa-99.vercel.app",  // your Vercel frontend URL
   methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
   allowedHeaders: ["Content-Type", "Authorization"],
   credentials: false
 }));
 
-// Allow preflight OPTIONS request (MOST IMPORTANT)
-app.options("*", cors());
+// Preflight (OPTIONS) MUST be handled
+app.options("/api/*", cors({
+  origin: "https://frontend-ten-kappa-99.vercel.app",
+  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization"],
+}));
+
 /* --------------------------------------------------------------- */
 
 app.use(express.json());
 
+// API routes
 app.use("/api/tables", tablesRoutes);
 app.use("/api/auth", authRoutes);
 app.use("/api/history", historyRoutes);
