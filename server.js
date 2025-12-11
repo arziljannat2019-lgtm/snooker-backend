@@ -13,8 +13,16 @@ const dayRoutes = require("./routes/dayRoutes");
 require("./db");
 
 const app = express();
-app.use(cors());
+app.use(cors({
+  origin: "*",
+  methods: ["GET", "POST", "PUT", "DELETE"],
+  allowedHeaders: ["Content-Type", "Authorization"],
+  credentials: false
+}));
+
+app.options("*", cors()); 
 app.use(express.json());
+
 
 app.use("/api/tables", tablesRoutes);
 app.use("/api/auth", authRoutes);
