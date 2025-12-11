@@ -1,8 +1,8 @@
-import express from "express";
-import { saveDayClose } from "../controllers/dayController.js";
+const express = require("express");
+const { saveDayClose } = require("../controllers/dayController");
 
 const router = express.Router();
 
 router.post("/close", saveDayClose);
 
-export default router;
+module.exports = router;

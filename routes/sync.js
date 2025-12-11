@@ -1,8 +1,8 @@
-import express from "express";
-import { syncOfflineSessions } from "../controllers/syncController.js";
+const express = require("express");
+const { syncOfflineSessions } = require("../controllers/syncController");
 
 const router = express.Router();
 
 router.post("/sessions", syncOfflineSessions);
 
-export default router;
+module.exports = router;

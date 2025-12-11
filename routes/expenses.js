@@ -1,8 +1,9 @@
-import express from "express";
-import { addExpense, getExpenses } from "../controllers/expensesController.js";
+const express = require("express");
+const { addExpense, getExpenses } = require("../controllers/expensesController");
+
 const router = express.Router();
 
 router.post("/add", addExpense);
-router.get("/list", getExpenses); // ?branch=Rasson1&date=2025-12-10
+router.get("/list", getExpenses);
 
-export default router;
+module.exports = router;

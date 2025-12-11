@@ -1,9 +1,10 @@
-import express from "express";
-import { getDailyReport, getMonthlyReport, getSummaryReport } from "../controllers/reportsController.js";
+const express = require("express");
+const { getDailyReport, getMonthlyReport, getSummaryReport } = require("../controllers/reportsController");
+
 const router = express.Router();
 
-router.get("/daily", getDailyReport);     // ?branch=Rasson1&date=2025-12-10
-router.get("/monthly", getMonthlyReport); // ?branch=Rasson1&month=2025-12
-router.get("/summary", getSummaryReport); // ?branch=Rasson1
+router.get("/daily", getDailyReport);
+router.get("/monthly", getMonthlyReport);
+router.get("/summary", getSummaryReport);
 
-export default router;
+module.exports = router;

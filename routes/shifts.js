@@ -1,7 +1,8 @@
-import express from "express";
-import { closeShift } from "../controllers/shiftsController.js";
+const express = require("express");
+const { closeShift } = require("../controllers/shiftsController");
+
 const router = express.Router();
 
-router.post("/close", closeShift); // body contains shift summary from frontend
+router.post("/close", closeShift);
 
-export default router;
+module.exports = router;
