@@ -1,33 +1,30 @@
 const express = require("express");
 const cors = require("cors");
-const app = express();
+const authRoutes = require("./routes/auth");
 
-// -------------------- CORS FIX --------------------
+const app = express();
+app.use(express.json());
+
+// CORS FIX
 app.use(
   cors({
     origin: "https://frontend-ten-kappa-99.vercel.app",
-    methods: "GET,POST,PUT,DELETE,OPTIONS",
-    allowedHeaders: "Content-Type, Authorization",
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"],
     credentials: true,
   })
 );
 
-app.options("*", cors()); // Preflight fix
-// --------------------------------------------------
+// VERY IMPORTANT
+app.options("*", cors());
 
-app.use(express.json());
+// MOUNT ROUTES
+app.use("/api/auth", authRoutes);
 
 // TEST ROUTE
 app.get("/", (req, res) => {
-  res.send("Backend Running with CORS 🔥✨");
+  res.send("Backend Running with CORS FIX ✨");
 });
 
-// IMPORT ROUTES
-const authRoutes = require("./routes/auth");
-app.use("/api/auth", authRoutes);
-
-// START SERVER
 const PORT = process.env.PORT || 10000;
-app.listen(PORT, () => {
-  console.log("Server running on port", PORT);
-});
+app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
