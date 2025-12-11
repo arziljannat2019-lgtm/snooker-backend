@@ -1,14 +1,16 @@
-import express from "express";
-import cors from "cors";
-import tablesRoutes from "./routes/tables.js";
-import syncRoutes from "./routes/sync.js";
-import authRoutes from "./routes/auth.js";
-import historyRoutes from "./routes/history.js";
-import reportRoutes from "./routes/reports.js";
-import shiftRoutes from "./routes/shifts.js";
-import expenseRoutes from "./routes/expenses.js";
-import dayRoutes from "./routes/dayRoutes.js";
-import "./db.js";
+const express = require("express");
+const cors = require("cors");
+
+const tablesRoutes = require("./routes/tables");
+const syncRoutes = require("./routes/sync");
+const authRoutes = require("./routes/auth");
+const historyRoutes = require("./routes/history");
+const reportRoutes = require("./routes/reports");
+const shiftRoutes = require("./routes/shifts");
+const expenseRoutes = require("./routes/expenses");
+const dayRoutes = require("./routes/dayRoutes");
+
+require("./db");
 
 const app = express();
 app.use(cors());
@@ -23,4 +25,6 @@ app.use("/api/expenses", expenseRoutes);
 app.use("/api/day", dayRoutes);
 app.use("/api/sync", syncRoutes);
 
-app.listen(5000, () => console.log("Backend running on port 5000"));
+// Render required port
+const PORT = process.env.PORT || 5000;
+app.listen(PORT, () => console.log(`Backend running on port ${PORT}`));

@@ -1,7 +1,7 @@
-import db from "../db.js";
+const db = require("../db");
 
 // CHECK-IN
-export const checkInTable = (req, res) => {
+exports.checkInTable = (req, res) => {
     const {
         table_id,
         rate_type,
@@ -20,14 +20,13 @@ export const checkInTable = (req, res) => {
         [table_id, branch_code, rate_type, frame_rate, century_rate],
         (err) => {
             if (err) return res.json({ success: false });
-
             res.json({ success: true });
         }
     );
 };
 
 // CHECK-OUT
-export const checkOutTable = (req, res) => {
+exports.checkOutTable = (req, res) => {
     const { table_id, canteen_amount } = req.body;
 
     const sql = `
@@ -39,13 +38,12 @@ export const checkOutTable = (req, res) => {
 
     db.query(sql, [canteen_amount, table_id], (err) => {
         if (err) return res.json({ success: false });
-
         res.json({ success: true });
     });
 };
 
 // HISTORY
-export const getTableHistory = (req, res) => {
+exports.getTableHistory = (req, res) => {
     const { table_id, branch } = req.query;
 
     const sql = `
@@ -56,7 +54,6 @@ export const getTableHistory = (req, res) => {
 
     db.query(sql, [table_id, branch], (err, rows) => {
         if (err) return res.json([]);
-
         res.json(rows);
     });
 };
