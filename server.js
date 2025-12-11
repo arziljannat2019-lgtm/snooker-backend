@@ -13,16 +13,20 @@ const dayRoutes = require("./routes/dayRoutes");
 require("./db");
 
 const app = express();
+
+/* ------------------ FINAL CORS FIX FOR VERCEL ------------------ */
 app.use(cors({
-  origin: "*",
-  methods: ["GET", "POST", "PUT", "DELETE"],
+  origin: "https://frontend-ten-kappa-99.vercel.app", // <-- Tumhara live frontend URL
+  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
   allowedHeaders: ["Content-Type", "Authorization"],
   credentials: false
 }));
 
-app.options("*", cors()); 
-app.use(express.json());
+// Allow preflight OPTIONS request (MOST IMPORTANT)
+app.options("*", cors());
+/* --------------------------------------------------------------- */
 
+app.use(express.json());
 
 app.use("/api/tables", tablesRoutes);
 app.use("/api/auth", authRoutes);
