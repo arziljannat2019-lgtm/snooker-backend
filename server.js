@@ -1,34 +1,43 @@
 const express = require("express");
 const cors = require("cors");
+const bodyParser = require("body-parser");
 
 const app = express();
 
-/* =======================
-   CORS – FINAL WORKING
-======================= */
-app.use(
-  cors({
-    origin: "https://frontend-ten-kappa-99.vercel.app",
-    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-    allowedHeaders: ["Content-Type", "Authorization"],
-    credentials: true
-  })
-);
+// ✅ CORS FIX (IMPORTANT)
+app.use(cors({
+  origin: [
+    "https://frontend-ten-kappa-99.vercel.app"
+  ],
+  methods: ["GET", "POST", "PUT", "DELETE"],
+  credentials: true
+}));
 
-/* BODY PARSER */
 app.use(express.json());
+app.use(bodyParser.json());
 
-/* TEST ROUTE */
+// TEST ROUTE
 app.get("/", (req, res) => {
-  res.send("Backend running OK with CORS");
+  res.send("Backend running OK");
 });
 
-/* AUTH ROUTES */
+// DB TEST
+app.get("/baby-test-db", async (req, res) => {
+  try {
+    const db = require("./db");
+    await db.query("SELECT 1");
+    res.json({ ok: true, message: "DB connected successfully" });
+  } catch (err) {
+    res.status(500).json({ ok: false, error: err.message });
+  }
+});
+
+// AUTH ROUTES
 const authRoutes = require("./routes/auth");
 app.use("/api/auth", authRoutes);
 
-/* SERVER START */
+// START SERVER
 const PORT = process.env.PORT || 10000;
 app.listen(PORT, () => {
-  console.log("Server running on port", PORT);
+  console.log("Server running on port " + PORT);
 });
