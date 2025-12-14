@@ -1,37 +1,36 @@
 const express = require("express");
-const app = express();
+const app = express;
 
-/* 🔥🔥🔥 HARD CORS FIX 🔥🔥🔥 */
+/* 🔥 ABSOLUTE CORS FIX */
 app.use((req, res, next) => {
-  res.header(
+  res.setHeader(
     "Access-Control-Allow-Origin",
     "https://frontend-ten-kappa-99.vercel.app"
   );
-  res.header(
+  res.setHeader(
     "Access-Control-Allow-Methods",
-    "GET,POST,PUT,DELETE,OPTIONS"
+    "GET, POST, PUT, DELETE, OPTIONS"
   );
-  res.header(
+  res.setHeader(
     "Access-Control-Allow-Headers",
     "Content-Type, Authorization"
   );
 
   if (req.method === "OPTIONS") {
-    return res.sendStatus(200);
+    return res.sendStatus(204);
   }
 
   next();
 });
-/* 🔥🔥🔥 END CORS 🔥🔥🔥 */
 
 app.use(express.json());
 
-// test
+/* TEST */
 app.get("/", (req, res) => {
-  res.send("Backend running OK");
+  res.send("Backend running OK with CORS");
 });
 
-// routes
+/* ROUTES */
 const authRoutes = require("./routes/auth");
 app.use("/api/auth", authRoutes);
 
