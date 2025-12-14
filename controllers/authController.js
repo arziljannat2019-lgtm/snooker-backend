@@ -1,10 +1,15 @@
 const db = require("../db");
 
 exports.loginUser = (req, res) => {
+  console.log("REQ BODY:", req.body);
+
   const { username, password } = req.body;
 
   if (!username || !password) {
-    return res.json({ success: false, message: "Missing fields" });
+    return res.json({
+      success: false,
+      message: "Missing fields"
+    });
   }
 
   const sql = "SELECT * FROM users WHERE username = ? AND password = ?";
@@ -21,7 +26,7 @@ exports.loginUser = (req, res) => {
 
     const user = rows[0];
 
-    return res.json({
+    res.json({
       success: true,
       role: user.role,
       token: "ok"
