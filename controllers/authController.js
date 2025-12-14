@@ -1,19 +1,11 @@
 const db = require("../db");
 
-exports.loginUser = (req, res) => {
-  const { username, password } = req.body;
+exports.loginUser = async (req, res) => {
+  try {
+    const { username, password } = req.body;
 
-  if (!username || !password) {
-    return res.status(400).json({ success: false, message: "Missing fields" });
-  }
-
-  const sql = "SELECT * FROM users WHERE username=? AND password=?";
-
-  db.query(sql, [username, password], (err, rows) => {
-    if (err) {
-      console.error(err);
-      return res.status(500).json({ success: false });
-    }
+    const sql = "SELECT * FROM users WHERE username = ? AND password = ?";
+    const [rows] = await db.query(sql, [username, password]);
 
     if (rows.length === 0) {
       return res.json({ success: false });
@@ -26,5 +18,8 @@ exports.loginUser = (req, res) => {
       role: user.role,
       token: "ok"
     });
-  });
+  } catch (err) {
+    console.error("LOGIN ERROR:", err);
+    res.status(500).json({ success: false, error: "Server error" });
+  }
 };
