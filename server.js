@@ -1,7 +1,10 @@
 const express = require("express");
-const app = express;
 
-/* 🔥 ABSOLUTE CORS FIX */
+const app = express(); // 🔥 THIS LINE WAS THE ISSUE IF MISSING
+
+/* =======================
+   CORS – FINAL FIX
+======================= */
 app.use((req, res, next) => {
   res.setHeader(
     "Access-Control-Allow-Origin",
@@ -23,17 +26,19 @@ app.use((req, res, next) => {
   next();
 });
 
+/* BODY PARSER */
 app.use(express.json());
 
-/* TEST */
+/* TEST ROUTE */
 app.get("/", (req, res) => {
   res.send("Backend running OK with CORS");
 });
 
-/* ROUTES */
+/* AUTH ROUTES */
 const authRoutes = require("./routes/auth");
 app.use("/api/auth", authRoutes);
 
+/* SERVER START */
 const PORT = process.env.PORT || 10000;
 app.listen(PORT, () => {
   console.log("Server running on port", PORT);
