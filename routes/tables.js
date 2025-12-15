@@ -1,9 +1,8 @@
 const express = require("express");
-const { checkInTable, checkOutTable } = require("../controllers/tablesController");
-
 const router = express.Router();
+const { getTables } = require("../controllers/tablesController");
 
-router.post("/checkin", checkInTable);
-router.post("/checkout", checkOutTable);
+// GET tables list
+router.get("/", getTables);
 
 module.exports = router;
