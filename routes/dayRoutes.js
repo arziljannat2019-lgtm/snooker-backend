@@ -1,8 +1,7 @@
 const express = require("express");
-const { saveDayClose } = require("../controllers/dayController");
-
 const router = express.Router();
+const day = require("../controllers/dayController");
 
-router.post("/close", saveDayClose);
+router.post("/close", day.closeDay);
 
 module.exports = router;

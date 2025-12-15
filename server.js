@@ -37,6 +37,8 @@ const authRoutes = require("./routes/auth");
 app.use("/api/auth", authRoutes);
 app.use("/api/tables", require("./routes/tables"));
 app.use("/api/shifts", require("./routes/shift"));
+app.use("/api/day", require("./routes/day"));
+
 
 // START SERVER
 const PORT = process.env.PORT || 10000;

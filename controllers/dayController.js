@@ -1,28 +1,31 @@
 const db = require("../db");
 
-exports.saveDayClose = (req, res) => {
-    const { shift1, shift2, combined } = req.body;
+exports.closeDay = async (req, res) => {
+  try {
+    const data = req.body;
 
-    const sql = `
-        INSERT INTO day_closings 
-        (date, shift1_json, shift2_json, combined_json) 
-        VALUES (?, ?, ?, ?)
-    `;
-
-    db.query(
-        sql,
-        [
-            new Date(),
-            JSON.stringify(shift1),
-            JSON.stringify(shift2),
-            JSON.stringify(combined)
-        ],
-        (err, result) => {
-            if (err) {
-                console.error("Day close save error:", err);
-                return res.status(500).json({ message: "Database error" });
-            }
-            res.json({ message: "Day close saved successfully" });
-        }
+    await db.query(
+      `INSERT INTO day_snapshots
+      (day_date, branch_code,
+       game_total, canteen_total,
+       game_collection, canteen_collection,
+       expenses, closing_cash)
+      VALUES (?,?,?,?,?,?,?,?)`,
+      [
+        data.day_date,
+        data.branch_code,
+        data.game_total,
+        data.canteen_total,
+        data.game_collection,
+        data.canteen_collection,
+        data.expenses,
+        data.closing_cash
+      ]
     );
+
+    res.json({ success: true });
+  } catch (err) {
+    console.error("DAY CLOSE ERROR:", err);
+    res.status(500).json({ success: false });
+  }
 };
