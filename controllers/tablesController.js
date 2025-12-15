@@ -35,26 +35,29 @@ exports.startTable = async (req, res) => {
     res.status(500).json({ error: "start failed" });
   }
 };
-// STOP TABLE
+// STOP TABLE (FIXED)
 exports.stopTable = async (req, res) => {
   try {
     const { table_id } = req.body;
 
-    // last open session lo
+    // 🔍 last session lo (end_time ignore)
     const [[session]] = await db.query(
-      "SELECT * FROM table_sessions WHERE table_id=? AND end_time IS NULL ORDER BY id DESC LIMIT 1",
+      "SELECT * FROM table_sessions WHERE table_id=? ORDER BY id DESC LIMIT 1",
       [table_id]
     );
 
-    if (!session) {
-      return res.json({ success: false, message: "No active session" });
+    if (!session || session.end_time) {
+      return res.json({
+        success: false,
+        message: "No running session found"
+      });
     }
 
     const start = new Date(session.start_time);
     const end = new Date();
     const minutes = Math.ceil((end - start) / 60000);
 
-    // table rate lo
+    // table rate
     const [[table]] = await db.query(
       "SELECT frame_rate FROM snooker_tables WHERE id=?",
       [table_id]
@@ -62,7 +65,7 @@ exports.stopTable = async (req, res) => {
 
     const amount = minutes * table.frame_rate;
 
-    // session close
+    // close session
     await db.query(
       "UPDATE table_sessions SET end_time=NOW(), total_minutes=?, total_amount=? WHERE id=?",
       [minutes, amount, session.id]
@@ -81,6 +84,7 @@ exports.stopTable = async (req, res) => {
     });
   } catch (err) {
     console.error("STOP TABLE ERROR:", err);
-    res.status(500).json({ error: "stop failed" });
+    res.status(500).json({ error: err.message });
   }
 };
+
