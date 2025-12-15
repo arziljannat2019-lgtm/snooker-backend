@@ -12,26 +12,33 @@ exports.getTables = async (req, res) => {
     res.status(500).json({ error: "Database error" });
   }
 };
-// START TABLE (FIXED)
+
+// START TABLE — RATE FROM FRONTEND
 exports.startTable = async (req, res) => {
   try {
-    const { table_id, frame_rate, century_rate } = req.body;
+    const { table_id, rate, play_type } = req.body;
 
-    // 🔹 ensure table exists (UPSERT)
+    if (!table_id || !rate) {
+      return res.json({
+        success: false,
+        message: "table_id and rate required"
+      });
+    }
+
+    // ensure table exists (status only)
     await db.query(
-      `INSERT INTO snooker_tables (id, name, frame_rate, century_rate, status)
-       VALUES (?, ?, ?, ?, 'running')
-       ON DUPLICATE KEY UPDATE
-         frame_rate = VALUES(frame_rate),
-         century_rate = VALUES(century_rate),
-         status='running'`,
-      [table_id, `Table ${table_id}`, frame_rate, century_rate]
+      `INSERT INTO snooker_tables (id, name, status)
+       VALUES (?, ?, 'running')
+       ON DUPLICATE KEY UPDATE status='running'`,
+      [table_id, `Table ${table_id}`]
     );
 
-    // 🔹 create session
+    // create session WITH RATE
     await db.query(
-      "INSERT INTO table_sessions (table_id, start_time) VALUES (?, NOW())",
-      [table_id]
+      `INSERT INTO table_sessions
+       (table_id, start_time, rate, play_type)
+       VALUES (?, NOW(), ?, ?)`,
+      [table_id, rate, play_type || "frame"]
     );
 
     res.json({ success: true });
@@ -41,21 +48,22 @@ exports.startTable = async (req, res) => {
   }
 };
 
-// STOP TABLE (FIXED)
+// STOP TABLE — USE SESSION RATE
 exports.stopTable = async (req, res) => {
   try {
     const { table_id } = req.body;
 
-    // 🔍 last session lo (end_time ignore)
     const [[session]] = await db.query(
-      "SELECT * FROM table_sessions WHERE table_id=? ORDER BY id DESC LIMIT 1",
+      `SELECT * FROM table_sessions
+       WHERE table_id=?
+       ORDER BY id DESC LIMIT 1`,
       [table_id]
     );
 
     if (!session || session.end_time) {
       return res.json({
         success: false,
-        message: "No running session found"
+        message: "No running session"
       });
     }
 
@@ -63,29 +71,18 @@ exports.stopTable = async (req, res) => {
     const end = new Date();
     const minutes = Math.ceil((end - start) / 60000);
 
-    // table rate
-const [[table]] = await db.query(
-  "SELECT frame_rate FROM snooker_tables WHERE id=?",
-  [table_id]
-);
+    // ⭐ RATE FROM SESSION (frontend ka rate)
+    const amount = minutes * session.rate;
 
-if (!table) {
-  return res.json({
-    success: false,
-    message: "Table not found in snooker_tables"
-  });
-}
-
-
-    const amount = minutes * table.frame_rate;
-
-    // close session
     await db.query(
-      "UPDATE table_sessions SET end_time=NOW(), total_minutes=?, total_amount=? WHERE id=?",
+      `UPDATE table_sessions
+       SET end_time=NOW(),
+           total_minutes=?,
+           total_amount=?
+       WHERE id=?`,
       [minutes, amount, session.id]
     );
 
-    // table idle
     await db.query(
       "UPDATE snooker_tables SET status='idle' WHERE id=?",
       [table_id]
@@ -94,6 +91,7 @@ if (!table) {
     res.json({
       success: true,
       minutes,
+      rate: session.rate,
       amount
     });
   } catch (err) {
@@ -101,4 +99,3 @@ if (!table) {
     res.status(500).json({ error: err.message });
   }
 };
-
