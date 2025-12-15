@@ -3,7 +3,7 @@ const router = express.Router();
 
 const {
   closeShift
-} = require("../controllers/shiftController");
+} = require("../controllers/shiftsController");
 
 // SHIFT CLOSE
 router.post("/close", closeShift);
