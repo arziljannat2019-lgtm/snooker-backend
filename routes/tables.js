@@ -1,13 +1,15 @@
 const express = require("express");
 const router = express.Router();
+
 const {
-  getTables,
   startTable,
   stopTable
 } = require("../controllers/tablesController");
 
-router.get("/", getTables);
+// START TABLE
 router.post("/start", startTable);
+
+// STOP TABLE
 router.post("/stop", stopTable);
 
 module.exports = router;
