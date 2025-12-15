@@ -37,7 +37,7 @@ const authRoutes = require("./routes/auth");
 app.use("/api/auth", authRoutes);
 app.use("/api/tables", require("./routes/tables"));
 app.use("/api/shifts", require("./routes/shifts"));
-app.use("/api/day", require("./routes/day"));
+app.use("/api/day", require("./routes/dayRoutes"));
 
 
 // START SERVER
