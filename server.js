@@ -36,6 +36,7 @@ app.get("/baby-test-db", async (req, res) => {
 const authRoutes = require("./routes/auth");
 app.use("/api/auth", authRoutes);
 app.use("/api/tables", require("./routes/tables"));
+app.use("/api/shifts", require("./routes/shift"));
 
 // START SERVER
 const PORT = process.env.PORT || 10000;

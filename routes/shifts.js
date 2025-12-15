@@ -1,8 +1,7 @@
 const express = require("express");
-const { closeShift } = require("../controllers/shiftsController");
-
 const router = express.Router();
+const shift = require("../controllers/shiftController");
 
-router.post("/close", closeShift);
+router.post("/close", shift.closeShift);
 
 module.exports = router;
