@@ -1,7 +1,11 @@
 const express = require("express");
 const router = express.Router();
-const shift = require("../controllers/shiftController");
 
-router.post("/close", shift.closeShift);
+const {
+  closeShift
+} = require("../controllers/shiftController");
+
+// SHIFT CLOSE
+router.post("/close", closeShift);
 
 module.exports = router;
