@@ -1,15 +1,11 @@
 const express = require("express");
 const router = express.Router();
+const tablesController = require("../controllers/tablesController");
 
-const {
-  startTable,
-  stopTable
-} = require("../controllers/tablesController");
+// table start
+router.post("/start", tablesController.startTable);
 
-// START TABLE
-router.post("/start", startTable);
-
-// STOP TABLE
-router.post("/stop", stopTable);
+// table stop
+router.post("/stop", tablesController.stopTable);
 
 module.exports = router;
