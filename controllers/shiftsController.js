@@ -1,31 +1,25 @@
-const db = require("../db");
+const db = require("../config/db");
 
+/**
+ * CLOSE SHIFT
+ * Frontend sends: shift_number, game_total, closing_cash
+ */
 exports.closeShift = async (req, res) => {
   try {
-    const data = req.body;
+    const { shift_no, game_total, closing_cash } = req.body;
+
+    if (!shift_no) {
+      return res.status(400).json({ success: false });
+    }
 
     await db.query(
       `INSERT INTO shift_snapshots
-      (shift_number, branch_code, open_time, close_time,
-       game_total, canteen_total,
-       game_collection, canteen_collection,
-       expenses, closing_cash)
-      VALUES (?,?,?,?,?,?,?,?,?,?)`,
-      [
-        data.shift_number,
-        data.branch_code,
-        data.open_time,
-        data.close_time,
-        data.game_total,
-        data.canteen_total,
-        data.game_collection,
-        data.canteen_collection,
-        data.expenses,
-        data.closing_cash
-      ]
+       (shift_no, game_total, closing_cash, created_at)
+       VALUES (?, ?, ?, NOW())`,
+      [shift_no, game_total || 0, closing_cash || 0]
     );
 
-    res.json({ success: true });
+    res.json({ success: true, message: "Shift closed successfully" });
   } catch (err) {
     console.error("SHIFT CLOSE ERROR:", err);
     res.status(500).json({ success: false });
