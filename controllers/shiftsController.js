@@ -1,3 +1,5 @@
+const db = require("../db");
+
 exports.closeShift = async (req, res) => {
   try {
     const data = req.body;
