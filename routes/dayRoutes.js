@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
-const { closeDay } = require("../controllers/dayController");
+const dayController = require("../controllers/dayController");
 
-router.post("/close", closeDay);
+router.post("/close", dayController.closeDay);
 
 module.exports = router;
