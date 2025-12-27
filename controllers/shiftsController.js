@@ -1,5 +1,3 @@
-const db = require("../db");
-
 exports.closeShift = async (req, res) => {
   try {
     const data = req.body;
@@ -10,7 +8,7 @@ exports.closeShift = async (req, res) => {
        game_total, canteen_total,
        game_collection, canteen_collection,
        expenses, closing_cash)
-       VALUES (?,?,?,?,?,?,?,?,?,?)`,
+      VALUES (?,?,?,?,?,?,?,?,?,?)`,
       [
         data.shift_number,
         data.branch_code,
@@ -27,7 +25,7 @@ exports.closeShift = async (req, res) => {
 
     res.json({ success: true });
   } catch (err) {
-    console.error(err);
+    console.error("SHIFT CLOSE ERROR:", err);
     res.status(500).json({ success: false });
   }
 };

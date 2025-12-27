@@ -13,35 +13,23 @@ play_type  -> "frame" | "century"
 
 exports.startTable = async (req, res) => {
   try {
-    const { table_id, frame_rate, century_rate, play_type } = req.body;
+    const {
+      table_id,
+      play_type,
+      frame_rate,
+      century_rate,
+      branch_code
+    } = req.body;
 
-    // basic validation
-    if (!table_id || !play_type) {
-      return res.json({
+    if (!table_id || !frame_rate) {
+      return res.status(400).json({
         success: false,
-        message: "table_id and play_type required"
+        message: "table_id & frame_rate required"
       });
     }
 
-    if (play_type === "frame" && !frame_rate) {
-      return res.json({
-        success: false,
-        message: "frame_rate required"
-      });
-    }
-
-    if (play_type === "century" && !century_rate) {
-      return res.json({
-        success: false,
-        message: "century_rate required"
-      });
-    }
-
-    // check if table already running
     const [running] = await db.query(
-      `SELECT id FROM table_sessions 
-       WHERE table_id = ? AND end_time IS NULL
-       LIMIT 1`,
+      "SELECT * FROM table_sessions WHERE table_id = ? AND end_time IS NULL",
       [table_id]
     );
 
@@ -52,26 +40,26 @@ exports.startTable = async (req, res) => {
       });
     }
 
-    // insert new session
     await db.query(
-      `INSERT INTO table_sessions 
-      (table_id, start_time, frame_rate, century_rate, play_type)
-      VALUES (?, NOW(), ?, ?, ?)`,
+      `INSERT INTO table_sessions
+      (table_id, start_time, frame_rate, century_rate, play_type, branch_code)
+      VALUES (?, NOW(), ?, ?, ?, ?)`,
       [
         table_id,
-        frame_rate || 0,
+        frame_rate,
         century_rate || 0,
-        play_type
+        play_type || "frame",
+        branch_code || null
       ]
     );
 
-    return res.json({ success: true });
-
+    res.json({ success: true });
   } catch (err) {
     console.error("START TABLE ERROR:", err);
-    res.status(500).json({ success: false, error: "Server error" });
+    res.status(500).json({ success: false });
   }
 };
+
 
 
 /*
@@ -87,18 +75,14 @@ exports.stopTable = async (req, res) => {
     const { table_id } = req.body;
 
     if (!table_id) {
-      return res.json({
+      return res.status(400).json({
         success: false,
         message: "table_id required"
       });
     }
 
-    // get running session
     const [rows] = await db.query(
-      `SELECT * FROM table_sessions
-       WHERE table_id = ? AND end_time IS NULL
-       ORDER BY id DESC
-       LIMIT 1`,
+      "SELECT * FROM table_sessions WHERE table_id = ? AND end_time IS NULL",
       [table_id]
     );
 
@@ -110,42 +94,34 @@ exports.stopTable = async (req, res) => {
     }
 
     const session = rows[0];
+    const minutes = Math.ceil(
+      (Date.now() - new Date(session.start_time)) / 60000
+    );
 
-    // time calculation
-    const startTime = new Date(session.start_time);
-    const endTime = new Date();
+    const rate =
+      session.play_type === "century"
+        ? session.century_rate
+        : session.frame_rate;
 
-    const diffMs = endTime - startTime;
-    const totalMinutes = Math.ceil(diffMs / 60000);
+    const amount = minutes * rate;
 
-    // rate selection (IMPORTANT)
-    let rate = 0;
-    if (session.play_type === "frame") {
-      rate = session.frame_rate;
-    } else {
-      rate = session.century_rate;
-    }
-
-    const totalAmount = totalMinutes * rate;
-
-    // update session
     await db.query(
       `UPDATE table_sessions
        SET end_time = NOW(),
            total_minutes = ?,
            total_amount = ?
        WHERE id = ?`,
-      [totalMinutes, totalAmount, session.id]
+      [minutes, amount, session.id]
     );
 
-    return res.json({
+    res.json({
       success: true,
-      minutes: totalMinutes,
-      amount: totalAmount
+      minutes,
+      amount
     });
-
   } catch (err) {
     console.error("STOP TABLE ERROR:", err);
-    res.status(500).json({ success: false, error: "Server error" });
+    res.status(500).json({ success: false });
   }
 };
+
