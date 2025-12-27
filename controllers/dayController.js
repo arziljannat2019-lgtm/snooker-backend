@@ -10,7 +10,7 @@ exports.closeDay = async (req, res) => {
 
     // 1️⃣ Total shifts
     const [shifts] = await db.query(
-      "SELECT COUNT(*) as total_shifts FROM shift_snapshots WHERE DATE(shift_date) = ?",
+      "SELECT COUNT(*) as total_shifts FROM shift_snapshots WHERE DATE(created_at) = ?",
       [date]
     );
 
