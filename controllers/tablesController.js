@@ -1,4 +1,5 @@
-const db = require("../config/db");
+const db = require("../db");
+
 
 /**
  * START TABLE (CHECK-IN)
