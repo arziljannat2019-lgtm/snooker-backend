@@ -1,25 +1,30 @@
-const db = require("../db"); // mysql pool
+const db = require("../db");
 
 exports.closeDay = async (req, res) => {
   try {
     const { date } = req.body;
 
     if (!date) {
-      return res.status(400).json({ success: false, message: "date required" });
+      return res.status(400).json({
+        success: false,
+        message: "date required"
+      });
     }
 
-    // 1️⃣ Total shifts
+    // 1️⃣ Total shifts (shift_snapshots)
     const [shifts] = await db.query(
-      "SELECT COUNT(*) as total_shifts FROM shift_snapshots WHERE DATE(created_at) = ?",
+      `SELECT COUNT(*) AS total_shifts
+       FROM shift_snapshots
+       WHERE DATE(created_at) = ?`,
       [date]
     );
 
     // 2️⃣ Total sessions + minutes + amount
     const [sessions] = await db.query(
       `SELECT 
-        COUNT(*) as total_sessions,
-        IFNULL(SUM(total_minutes),0) as total_minutes,
-        IFNULL(SUM(total_amount),0) as total_amount
+        COUNT(*) AS total_sessions,
+        IFNULL(SUM(total_minutes), 0) AS total_minutes,
+        IFNULL(SUM(total_amount), 0) AS total_amount
        FROM table_sessions
        WHERE DATE(start_time) = ?`,
       [date]
@@ -27,9 +32,9 @@ exports.closeDay = async (req, res) => {
 
     // 3️⃣ Insert day snapshot
     await db.query(
-      `INSERT INTO day_snapshots 
+      `INSERT INTO day_snapshots
       (day_date, total_shifts, total_sessions, total_minutes, total_amount)
-      VALUES (?,?,?,?,?)`,
+      VALUES (?, ?, ?, ?, ?)`,
       [
         date,
         shifts[0].total_shifts,
@@ -39,7 +44,10 @@ exports.closeDay = async (req, res) => {
       ]
     );
 
-    return res.json({ success: true });
+    return res.json({
+      success: true,
+      message: "Day closed successfully"
+    });
 
   } catch (err) {
     console.error("DAY CLOSE ERROR:", err);
