@@ -1,4 +1,9 @@
-const db = require("../db");
+const { Pool } = require("pg");
+
+const pool = new Pool({
+  connectionString: process.env.DATABASE_URL,
+  ssl: { rejectUnauthorized: false }
+});
 
 exports.loginUser = async (req, res) => {
   try {
@@ -11,14 +16,17 @@ exports.loginUser = async (req, res) => {
       });
     }
 
-    const sql = "SELECT * FROM users WHERE username=? AND password=?";
-    const [rows] = await db.query(sql, [username, password]);
+    // Postgres query
+    const result = await pool.query(
+      "SELECT * FROM users WHERE username=$1 AND password=$2",
+      [username, password]
+    );
 
-    if (rows.length === 0) {
+    if (result.rows.length === 0) {
       return res.json({ success: false });
     }
 
-    const user = rows[0];
+    const user = result.rows[0];
 
     res.json({
       success: true,
